@@ -2,6 +2,7 @@ const asyncHandler = require("express-async-handler");
 const User = require("../models/user.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const path = require("path");
 
 // @desc Register the user
 // @route POST users/register
@@ -40,7 +41,9 @@ const registerUser = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error("User data was not valid");
     }
-    res.json({ message: "Register the user" });
+
+    res.sendFile(path.join(__dirname, '..', 'Pages', 'login.html'));
+    res.json({ message: "User Registered!" });
 });
 
 // @desc Login the user
@@ -65,13 +68,15 @@ const loginUser = asyncHandler(async (req, res) => {
             }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "60m" }
         )
 
+        // res.sendFile(path.join(__dirname, '..', 'Pages', 'game.html'));
+
         res.status(200).json({ accessToken })
     } else {
         res.status(401);
         throw new Error("email or password is not valid!");
     }
 
-    res.json({ message: "Login user" });
+    // res.json({ message: "User logged in" });
 });
 
 // @desc Get Current user

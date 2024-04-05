@@ -110,7 +110,19 @@
                 },
                 body: JSON.stringify(formData)
             })
-                .then(response => response.text())
+                .then(response => {
+                    response.text()
+                    if (response.ok) {
+                        // If the response is successful, redirect to the desired URL
+                        window.location.href = 'http://localhost:3000/game.html';
+                    } else {
+                        // Handle errors if needed
+                        console.error('Error:', response.statusText);
+                        errorElement.textContent = 'Please enter correcct email and password.';
+
+                    }
+                }
+                )
                 .then(data => {
                     console.log(data);
                 })

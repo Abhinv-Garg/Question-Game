@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        #question {
+            margin-top: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        #answers {
+            margin-top: 10px;
+        }
+
+        #answers button {
+            display: block;
+            margin: 5px auto;
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #answers button:hover {
+            background-color: #45a049;
+        }
+
+        #timer {
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+
+        #startGame,
+        #restartGame {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #008CBA;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #startGame:hover,
+        #restartGame:hover {
+            background-color: #005f73;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Welcome, <span id="userName"></span>!</h1>
+    <div id="question"></div>
+    <div id="answers"></div>
+    <div id="timer"></div>
+    <button id="startGame">Start Game</button>
+    <button id="restartGame">Restart Game</button>
+
+    <!-- Add your script tag here -->
+    <script src="game.js"></script>
+</body>
+
+</html>

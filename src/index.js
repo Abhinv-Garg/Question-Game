@@ -6,6 +6,8 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const config = require("./config/config");
 const erroHandler = require("./middleware/errorHandler");
+const path = require("path");
+
 
 //Setting up express
 app.use(cors());
@@ -25,12 +27,21 @@ db.once("open", () => {
   console.log("Connected to MongoDB");
 });
 
+app.set('view engine', 'ejs');
+app.set('views', __dirname + '/Pages'); // Optional: set the views directory
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+
 //Routes
 const appRoutes = require("./routes/app.route");
 app.use("/", appRoutes);
 
 const userRoutes = require("./routes/user.route");
 app.use("/users", userRoutes);
+
+const gameRoutes = require("./routes/game.route");
+app.use("/game", gameRoutes);
 
 //Server Listening
 app.listen(config.PORT, () => {
