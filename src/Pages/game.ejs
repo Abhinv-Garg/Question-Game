@@ -91,6 +91,7 @@
             const restartButton = document.getElementById('restartGame'); // Define restartButton
 
             let correctyansweredQuestions = 0;
+            const userResponses = []; // Array to store user responses
 
             let timer; // Variable to store the timer interval
             let questionCount = 0; // Variable to track the number of questions asked
@@ -100,24 +101,20 @@
                 window.location.reload();
             });
 
-
             startButton.addEventListener('click', startGame);
             restartButton.addEventListener('click', startGame);
 
             restartButton.style.display = 'none';
             home.style.display = 'none';
 
-
-
             function startGame() {
-
                 startButton.style.display = 'none';
                 restartButton.style.display = 'inline';
                 home.style.display = 'inline';
 
                 correctyansweredQuestions = 0;
                 questionCount = 0; // Reset question count
-                askedQuestions.length = 0; // Clear asked questions array
+                userResponses.length = 0; // Clear user responses array
                 clearInterval(timer);
                 nextQuestion();
             }
@@ -201,6 +198,9 @@
                 resultDiv.textContent = resultMessage;
                 answersDiv.appendChild(resultDiv);
 
+                // Store user response in the userResponses array
+                userResponses.push({ selectedAnswer, correctAnswer, isCorrect: selectedAnswer === correctAnswer });
+
                 // Remove the result message after a short delay
                 setTimeout(() => {
                     resultDiv.remove();
@@ -214,9 +214,17 @@
                 questionDiv.textContent = '';
                 answersDiv.innerHTML = '';
 
+                // Display each question with user response and correctness
+                userResponses.forEach((response, index) => {
+                    const questionNumber = index + 1;
+                    const resultMessage = `Question ${questionNumber}: ${response.selectedAnswer} (${response.isCorrect ? 'Correct' : 'Incorrect'})`;
+                    const resultDiv = document.createElement('div');
+                    resultDiv.textContent = resultMessage;
+                    answersDiv.appendChild(resultDiv);
+                });
+
                 // Calculate and display game result
-                const score = questionCount;
-                const correctAnswers = score;
+                const score = correctyansweredQuestions;
                 const resultMessage = `Game Over! You answered ${correctyansweredQuestions} questions correctly out of 10.`;
                 questionDiv.textContent = resultMessage;
 
