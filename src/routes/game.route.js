@@ -8,7 +8,9 @@ const Router = express.Router();
 
 //Setting up Routes
 
-// Router.get("/start-game", validateToken, startGame);
+Router.get("/game-home", (req, res) => {
+    res.render("game");
+});
 Router.get("/start-game", startGame);
 
 

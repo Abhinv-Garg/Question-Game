@@ -42,8 +42,8 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new Error("User data was not valid");
     }
 
-    res.sendFile(path.join(__dirname, '..', 'Pages', 'login.html'));
-    res.json({ message: "User Registered!" });
+    // res.sendFile(path.join(__dirname, '..', 'Pages', 'login.html'));
+    // res.json({ message: "User Registered!" });
 });
 
 // @desc Login the user
