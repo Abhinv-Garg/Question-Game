@@ -27,6 +27,10 @@
             margin-top: 10px;
         }
 
+        #answers div {
+            margin-bottom: 10px;
+        }
+
         #answers button {
             display: block;
             margin: 5px auto;
@@ -68,6 +72,20 @@
         #home:hover {
             background-color: #005f73;
         }
+
+        #restartGame {
+            margin-top: 20px;
+        }
+
+        #restartGame:hover {
+            background-color: #005f73;
+        }
+
+        /* Test styling */
+        .test {
+            color: #666;
+            font-style: italic;
+        }
     </style>
 </head>
 
@@ -80,7 +98,6 @@
     <button id="restartGame">Restart Game</button>
     <button id="home">Home</button>
 
-    <!-- Add your script tag here -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const startButton = document.getElementById('startGame');
@@ -88,14 +105,14 @@
             const answersDiv = document.getElementById('answers');
             const timerDiv = document.getElementById('timer');
             const home = document.getElementById('home');
-            const restartButton = document.getElementById('restartGame'); // Define restartButton
+            const restartButton = document.getElementById('restartGame');
 
             let correctyansweredQuestions = 0;
-            const userResponses = []; // Array to store user responses
+            const userResponses = [];
 
-            let timer; // Variable to store the timer interval
-            let questionCount = 0; // Variable to track the number of questions asked
-            const askedQuestions = []; // Array to store already asked questions
+            let timer;
+            let questionCount = 0;
+            const askedQuestions = [];
 
             home.addEventListener('click', () => {
                 window.location.reload();
@@ -113,41 +130,41 @@
                 home.style.display = 'inline';
 
                 correctyansweredQuestions = 0;
-                questionCount = 0; // Reset question count
-                userResponses.length = 0; // Clear user responses array
+                questionCount = 0;
+                userResponses.length = 0;
                 clearInterval(timer);
                 nextQuestion();
             }
 
             function nextQuestion() {
-                // Check if the maximum number of questions has been reached
                 if (questionCount >= 10) {
-                    displayGameResult(); // Display game result when 10 questions have been asked
+                    displayGameResult();
                     return;
                 }
 
-                // Fetch game data from the server
                 fetch('http://localhost:3000/game/start-game')
                     .then(response => response.json())
                     .then(data => {
                         const uniqueQuestion = getUniqueQuestion(data);
                         renderQuestion(uniqueQuestion);
-                        startTimer(); // Start the timer for the current question
+                        startTimer();
+
+                        userResponses.push({
+                            question: uniqueQuestion.question,
+                            selectedAnswer: null,
+                            isCorrect: null
+                        });
                     })
                     .catch(error => console.error('Error starting game:', error));
             }
 
             function getUniqueQuestion(data) {
-                // Filter out questions that have already been asked
                 const uniqueQuestions = data.filter(question => !askedQuestions.includes(question.question));
                 if (uniqueQuestions.length === 0) {
-                    // If all questions have been asked, reset asked questions array
                     askedQuestions.length = 0;
                 }
-                // Select a random question from the unique questions array
                 const randomIndex = Math.floor(Math.random() * uniqueQuestions.length);
                 const selectedQuestion = uniqueQuestions[randomIndex];
-                // Add the selected question to the asked questions array
                 askedQuestions.push(selectedQuestion.question);
                 questionCount++;
                 return selectedQuestion;
@@ -155,20 +172,18 @@
 
             function renderQuestion(questionData) {
                 questionDiv.textContent = questionData.question;
-
-                // Clear previous answer buttons
                 answersDiv.innerHTML = '';
 
                 questionData.answers.forEach(answer => {
                     const button = document.createElement('button');
                     button.textContent = answer;
-                    button.addEventListener('click', () => checkAnswer(answer, questionData.correctAnswer));
+                    button.addEventListener('click', () => checkAnswer(answer, questionData.correctAnswer, questionData.question));
                     answersDiv.appendChild(button);
                 });
             }
 
             function startTimer() {
-                let timeLeft = 30; // 30 seconds timer
+                let timeLeft = 30;
                 timerDiv.textContent = `Time left: ${timeLeft} seconds`;
 
                 timer = setInterval(() => {
@@ -178,74 +193,61 @@
                     } else {
                         clearInterval(timer);
                         timerDiv.textContent = 'Time\'s up!';
-                        checkAnswer('', ''); // Check answer with empty selected answer (indicating time's up)
+                        checkAnswer('', '', ''); // Call checkAnswer with empty parameters when time runs out
                     }
                 }, 1000);
             }
 
-            function checkAnswer(selectedAnswer, correctAnswer) {
+            function checkAnswer(selectedAnswer, correctAnswer, question) {
                 clearInterval(timer);
                 let resultMessage;
-                if (selectedAnswer === correctAnswer) {
+                if (selectedAnswer === correctAnswer && selectedAnswer !== '') { // Check if selectedAnswer is not empty
                     resultMessage = 'Correct!';
                     correctyansweredQuestions++;
+                } else if (selectedAnswer === '') { // Handle case when no answer is selected (time runs out)
+                    resultMessage = 'Time\'s up!'; // Display appropriate message
                 } else {
                     resultMessage = 'Incorrect!';
                 }
 
-                // Display result message
                 const resultDiv = document.createElement('div');
                 resultDiv.textContent = resultMessage;
                 answersDiv.appendChild(resultDiv);
 
-                // Store user response in the userResponses array
-                userResponses.push({ selectedAnswer, correctAnswer, isCorrect: selectedAnswer === correctAnswer });
+                const currentUserResponse = userResponses[userResponses.length - 1];
+                currentUserResponse.selectedAnswer = selectedAnswer;
+                currentUserResponse.isCorrect = selectedAnswer === correctAnswer;
 
-                // Remove the result message after a short delay
                 setTimeout(() => {
                     resultDiv.remove();
-                    // Render the next question
                     nextQuestion();
                 }, 2000);
             }
 
             function displayGameResult() {
-                // Clear question and answer sections
                 questionDiv.textContent = '';
                 answersDiv.innerHTML = '';
+                timerDiv.textContent = '';
 
-                // Display each question with user response and correctness
                 userResponses.forEach((response, index) => {
                     const questionNumber = index + 1;
                     const resultMessage = `Question ${questionNumber}: ${response.selectedAnswer} (${response.isCorrect ? 'Correct' : 'Incorrect'})`;
                     const resultDiv = document.createElement('div');
                     resultDiv.textContent = resultMessage;
                     answersDiv.appendChild(resultDiv);
+
+                    const questionElement = document.createElement('div');
+                    questionElement.textContent = `Original Question: ${response.question}`;
+                    answersDiv.appendChild(questionElement);
+                    answersDiv.appendChild(document.createElement('br'));
                 });
 
-                // Calculate and display game result
-                const score = correctyansweredQuestions;
                 const resultMessage = `Game Over! You answered ${correctyansweredQuestions} questions correctly out of 10.`;
                 questionDiv.textContent = resultMessage;
 
-                // Show restart button
-                restartButton.style.display = 'block';
+                restartButton.style.display = 'inline-block';
             }
-
         });
-
-        // document.addEventListener('DOMContentLoaded', () => {
-        //     // Fetch the user's name from the server
-        //     fetch('/user')
-        //         .then(response => response.json())
-        //         .then(data => {
-        //             const userName = data.name;
-        //             const userNameElement = document.getElementById('userName');
-        //             userNameElement.textContent = userName;
-        //         })
-        //         .catch(error => console.error('Error fetching user data:', error));
-        // });
-
     </script>
 </body>
 
